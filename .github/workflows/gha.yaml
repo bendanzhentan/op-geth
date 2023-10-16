@@ -1,0 +1,42 @@
+name: GHA WorkFlow
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+
+    - uses: actions/setup-go@v4
+      with:
+        go-version: '^1.21.3'
+
+        # - name: Set up Docker
+        #   run: |
+        #     mkdir -p ~/.docker
+        #     for img in `ls ~/.docker`; do docker load -i ~/.docker/$img; done
+
+    - name: Install dependencies
+      run: |
+        go get -u github.com/karalabe/hive
+        # cd ~/.go_workspace/src/github.com/karalabe/hive && mkdir -p workspace/ethash/ ~/.ethash
+        # cd ~/.go_workspace/src/github.com/karalabe/hive && cp -r ~/.ethash/. workspace/ethash/
+        # cd ~/.go_workspace/src/github.com/karalabe/hive && hive --docker-noshell --client=NONE --test=. --sim=. --loglevel=6
+        # for img in `docker images | grep -v "^<none>" | tail -n +2 | awk '{print $1}'`; do docker save $img > ~/.docker/`echo $img | tr '/' ':'`.tar; done
+        # cp -r ~/.go_workspace/src/github.com/karalabe/hive/workspace/ethash/. ~/.ethash
+
+    - name: Compile and test
+      run: |
+        make geth
+        cp ./build/bin/geth $HOME/geth
+        cd ~/.go_workspace/src/github.com/karalabe/hive && hive --docker-noshell --client=go-ethereum:local --override=$HOME/geth --test=. --sim=.
+        # cp -r ~/.go_workspace/src/github.com/karalabe/hive/workspace/logs/* $HOME/workflow/artifacts
+
+    - name: Publish workflow artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: workflow-artifacts
+        path: ${{ github.workspace }}/workflow/artifacts/
