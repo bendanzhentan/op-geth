@@ -39,7 +39,8 @@ jobs:
 
         # ./hive/hive --client=op-geth --sim=devp2p
 
-        ./hive/hive --sim devp2p --sim.limit discv4 --client go-ethereum,openethereum
+        cd hive
+        ./hive --sim devp2p --sim.limit discv4 --client go-ethereum,openethereum
 
         # cp -r ~/.go_workspace/src/github.com/karalabe/hive/workspace/logs/* $HOME/workflow/artifacts
 
