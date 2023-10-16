@@ -35,7 +35,7 @@ jobs:
 
         make geth
         cp ./build/bin/geth $HOME/geth
-        ./hive/hive --docker-noshell --client=go-ethereum:local --override=$HOME/geth --test=. --sim=.
+        ./hive/hive --client=go-ethereum:local --override=$HOME/geth --test=. --sim=.
         # cp -r ~/.go_workspace/src/github.com/karalabe/hive/workspace/logs/* $HOME/workflow/artifacts
 
     - name: Publish workflow artifacts
