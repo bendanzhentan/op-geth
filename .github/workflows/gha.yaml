@@ -26,20 +26,16 @@ jobs:
         sudo usermod -aG docker $USER
         exec sudo su -l $USER
 
-    - name: Install dependencies
-      run: |
-        go get -u github.com/ethereum/hive
-        # cd ~/.go_workspace/src/github.com/karalabe/hive && mkdir -p workspace/ethash/ ~/.ethash
-        # cd ~/.go_workspace/src/github.com/karalabe/hive && cp -r ~/.ethash/. workspace/ethash/
-        # cd ~/.go_workspace/src/github.com/karalabe/hive && hive --docker-noshell --client=NONE --test=. --sim=. --loglevel=6
-        # for img in `docker images | grep -v "^<none>" | tail -n +2 | awk '{print $1}'`; do docker save $img > ~/.docker/`echo $img | tr '/' ':'`.tar; done
-        # cp -r ~/.go_workspace/src/github.com/karalabe/hive/workspace/ethash/. ~/.ethash
-
     - name: Compile and test
       run: |
+        git clone https://github.com/ethereum/hive
+        cd ./hive
+        go build .
+        cd ..
+
         make geth
         cp ./build/bin/geth $HOME/geth
-        cd ~/.go_workspace/src/github.com/karalabe/hive && hive --docker-noshell --client=go-ethereum:local --override=$HOME/geth --test=. --sim=.
+        ./hive/hive --docker-noshell --client=go-ethereum:local --override=$HOME/geth --test=. --sim=.
         # cp -r ~/.go_workspace/src/github.com/karalabe/hive/workspace/logs/* $HOME/workflow/artifacts
 
     - name: Publish workflow artifacts
