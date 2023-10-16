@@ -28,6 +28,8 @@ jobs:
 
     - name: Compile and test
       run: |
+        sudo apt install build-essential
+
         git clone https://github.com/ethereum/hive
         cd ./hive
         go build .
