@@ -61,11 +61,19 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 			}
 			nodes = append(nodes, n)
 		case *fullNode:
-			tn = n.Children[key[0]]
-			prefix = append(prefix, key[0])
-			key = key[1:]
-			nodes = append(nodes, n)
-			log.Info("bilibili loop", "marker", hexutils.BytesToHex(marker), "index", i, "type", "FULL NODE")
+			if len(key) == 0 {
+				nodes = append(nodes, n)
+				tn = nil
+				log.Info("bilibili loop", "marker", hexutils.BytesToHex(marker), "index", i, "type", "FULL NODE", "key1", len(key))
+			} else {
+
+				tn = n.Children[key[0]]
+				prefix = append(prefix, key[0])
+				key = key[1:]
+				nodes = append(nodes, n)
+				log.Info("bilibili loop", "marker", hexutils.BytesToHex(marker), "index", i, "type", "FULL NODE", "key", len(key))
+			}
+
 		case hashNode:
 			log.Info("bilibili loop", "marker", hexutils.BytesToHex(marker), "index", i, "type", "HASH NODE")
 			// Retrieve the specified node from the underlying node reader.
