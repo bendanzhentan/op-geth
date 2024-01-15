@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/status-im/keycard-go/hexutils"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -42,7 +43,8 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 		tn     = t.root
 	)
 	key = keybytesToHex(key)
-	log.Info("bilibili Trie.Prove", "key1", hexutils.BytesToHex(keybytesToHex(key)), "key2", hexutils.BytesToHex(key), "fromLevel", fromLevel)
+	marker := key[:len(key)-1]
+	log.Info("bilibili Trie.Prove", "marker", hexutils.BytesToHex(marker), "key1", hexutils.BytesToHex(keybytesToHex(key)), "key2", hexutils.BytesToHex(key), "fromLevel", fromLevel)
 	i := 0
 	for len(key) > 0 && tn != nil {
 		switch n := tn.(type) {
@@ -50,12 +52,12 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 			if len(key) < len(n.Key) || !bytes.Equal(n.Key, key[:len(n.Key)]) {
 				// The trie doesn't contain the key.
 				tn = nil
-				log.Info("bilibili loop", "index", i, "type", "SHORT NODE", "note", "key not found")
+				log.Info("bilibili loop", "marker", hexutils.BytesToHex(marker), "index", i, "type", "SHORT NODE", "note", "key not found")
 			} else {
 				tn = n.Val
 				prefix = append(prefix, n.Key...)
 				key = key[len(n.Key):]
-				log.Info("bilibili loop", "index", i, "type", "SHORT NODE", "note", "key found")
+				log.Info("bilibili loop", "marker", hexutils.BytesToHex(marker), "index", i, "type", "SHORT NODE", "note", "key found")
 			}
 			nodes = append(nodes, n)
 		case *fullNode:
@@ -63,9 +65,9 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 			prefix = append(prefix, key[0])
 			key = key[1:]
 			nodes = append(nodes, n)
-			log.Info("bilibili loop", "index", i, "type", "FULL NODE")
+			log.Info("bilibili loop", "marker", hexutils.BytesToHex(marker), "index", i, "type", "FULL NODE")
 		case hashNode:
-			log.Info("bilibili loop", "index", i, "type", "HASH NODE")
+			log.Info("bilibili loop", "marker", hexutils.BytesToHex(marker), "index", i, "type", "HASH NODE")
 			// Retrieve the specified node from the underlying node reader.
 			// trie.resolveAndTrack is not used since in that function the
 			// loaded blob will be tracked, while it's not required here since
@@ -104,6 +106,7 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 			}
 		}
 	}
+	time.Sleep(time.Second)
 	return nil
 }
 
