@@ -740,6 +740,7 @@ func (s *BlockChainAPI) GetProof(ctx context.Context, address common.Address, st
 		return nil, proofErr
 	}
 
+	time.Sleep(time.Second)
 	return &AccountResult{
 		Address:      address,
 		AccountProof: toHexSlice(accountProof),
