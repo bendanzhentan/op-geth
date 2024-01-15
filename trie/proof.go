@@ -95,18 +95,21 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 		}
 		i += 1
 	}
-	log.Info("bilibili finish", "len(key)", len(key), "tn", tn, "tn==nil", tn == nil)
+	log.Info("bilibili finish", "len(key)", len(key), "tn", tn, "tn==nil", tn == nil, "nodes.len", len(nodes))
 	hasher := newHasher(false)
 	defer returnHasherToPool(hasher)
 
+	proofDbPushed := 0
 	for i, n := range nodes {
 		if fromLevel > 0 {
+			log.Info("bilibili fromLevel", "fromLevel", fromLevel)
 			fromLevel--
 			continue
 		}
 		var hn node
 		n, hn = hasher.proofHash(n)
 		if hash, ok := hn.(hashNode); ok || i == 0 {
+			log.Info("bilibili transfer", "ok", ok, "i", i)
 			// If the node's database encoding is a hash (or is the
 			// root node), it becomes a proof element.
 			enc := nodeToBytes(n)
@@ -115,9 +118,14 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 			}
 			if err := proofDb.Put(hash, enc); err != nil {
 				log.Error("bilibili proofDb.Put", "err", err)
+			} else {
+				proofDbPushed++
 			}
+		} else {
+			log.Info("bilibili transfer222", "ok", ok, "i", i)
 		}
 	}
+	log.Info("bilibili proofDbPushed", "proofDbPushed", proofDbPushed, "nodes", len(nodes))
 	time.Sleep(time.Second)
 	return nil
 }
