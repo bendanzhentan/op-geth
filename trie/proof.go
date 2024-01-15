@@ -46,7 +46,7 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 	marker := key[:len(key)-1]
 	log.Info("bilibili Trie.Prove", "marker", hexutils.BytesToHex(marker), "key1", hexutils.BytesToHex(keybytesToHex(key)), "key2", hexutils.BytesToHex(key), "fromLevel", fromLevel)
 	i := 0
-	for len(key) > 0 && tn != nil {
+	for len(key) >= 0 && tn != nil {
 		switch n := tn.(type) {
 		case *shortNode:
 			if len(key) < len(n.Key) || !bytes.Equal(n.Key, key[:len(n.Key)]) {
