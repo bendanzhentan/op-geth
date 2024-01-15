@@ -53,7 +53,7 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 				// The trie doesn't contain the key.
 				tn = nil
 				log.Info("bilibili loop", "marker", hexutils.BytesToHex(marker), "index", i, "type", "SHORT NODE", "note", "key not found")
-			} else {
+			} else { // len(key) == len(n.Key) && bytes.Equal(n.Key, key[:len(n.Key)])
 				tn = n.Val
 				prefix = append(prefix, n.Key...)
 				key = key[len(n.Key):]
@@ -84,6 +84,7 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 		}
 		i += 1
 	}
+	log.Info("bilibili finish", "len(key)", len(key), "tn", tn, "tn==nil", tn == nil)
 	hasher := newHasher(false)
 	defer returnHasherToPool(hasher)
 
