@@ -41,16 +41,20 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 		tn     = t.root
 	)
 	key = keybytesToHex(key)
+	log.Info("bilibili Trie.Prove", "key", keybytesToHex(key), "fromLevel", fromLevel)
+	i := 0
 	for len(key) > 0 && tn != nil {
 		switch n := tn.(type) {
 		case *shortNode:
 			if len(key) < len(n.Key) || !bytes.Equal(n.Key, key[:len(n.Key)]) {
 				// The trie doesn't contain the key.
 				tn = nil
+				log.Info("bilibili loop", "index", i, "type", "SHORT NODE", "note", "key not found")
 			} else {
 				tn = n.Val
 				prefix = append(prefix, n.Key...)
 				key = key[len(n.Key):]
+				log.Info("bilibili loop", "index", i, "type", "SHORT NODE", "note", "key found")
 			}
 			nodes = append(nodes, n)
 		case *fullNode:
@@ -58,7 +62,9 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 			prefix = append(prefix, key[0])
 			key = key[1:]
 			nodes = append(nodes, n)
+			log.Info("bilibili loop", "index", i, "type", "FULL NODE")
 		case hashNode:
+			log.Info("bilibili loop", "index", i, "type", "HASH NODE")
 			// Retrieve the specified node from the underlying node reader.
 			// trie.resolveAndTrack is not used since in that function the
 			// loaded blob will be tracked, while it's not required here since
@@ -73,6 +79,7 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 		default:
 			panic(fmt.Sprintf("%T: invalid node: %v", tn, tn))
 		}
+		i += 1
 	}
 	hasher := newHasher(false)
 	defer returnHasherToPool(hasher)
@@ -91,7 +98,9 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 			if !ok {
 				hash = hasher.hashData(enc)
 			}
-			proofDb.Put(hash, enc)
+			if err := proofDb.Put(hash, enc); err != nil {
+				log.Error("bilibili proofDb.Put", "err", err)
+			}
 		}
 	}
 	return nil

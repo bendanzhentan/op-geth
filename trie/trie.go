@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/log"
@@ -109,6 +108,9 @@ func (t *Trie) NodeIterator(start []byte) NodeIterator {
 // The value bytes must not be modified by the caller.
 func (t *Trie) Get(key []byte) []byte {
 	res, err := t.TryGet(key)
+
+	log.Info("Trie.Get", "key", key, "bytes2Hash", common.Bytes2Hex(keybytesToHex(key)), "res", res)
+
 	if err != nil {
 		log.Error("Unhandled trie error in Trie.Get", "err", err)
 	}
@@ -120,6 +122,9 @@ func (t *Trie) Get(key []byte) []byte {
 // If a node was not found in the database, a MissingNodeError is returned.
 func (t *Trie) TryGet(key []byte) ([]byte, error) {
 	value, newroot, didResolve, err := t.tryGet(t.root, keybytesToHex(key), 0)
+
+	log.Info("Trie.TryGet", "key", key, "bytes2Hash", common.Bytes2Hex(keybytesToHex(key)), "res", value)
+
 	if err == nil && didResolve {
 		t.root = newroot
 	}
@@ -166,6 +171,9 @@ func (t *Trie) tryGet(origNode node, key []byte, pos int) (value []byte, newnode
 // possible to use keybyte-encoding as the path might contain odd nibbles.
 func (t *Trie) TryGetNode(path []byte) ([]byte, int, error) {
 	item, newroot, resolved, err := t.tryGetNode(t.root, compactToHex(path), 0)
+
+	log.Info("Trie.TryGetNode", "key", path, "bytes2Hash", common.Bytes2Hex(keybytesToHex(path)))
+
 	if err != nil {
 		return nil, resolved, err
 	}
