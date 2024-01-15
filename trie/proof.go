@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/status-im/keycard-go/hexutils"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -41,7 +42,7 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 		tn     = t.root
 	)
 	key = keybytesToHex(key)
-	log.Info("bilibili Trie.Prove", "key", keybytesToHex(key), "fromLevel", fromLevel)
+	log.Info("bilibili Trie.Prove", "key1", hexutils.BytesToHex(keybytesToHex(key)), "key2", hexutils.BytesToHex(key), "fromLevel", fromLevel)
 	i := 0
 	for len(key) > 0 && tn != nil {
 		switch n := tn.(type) {
