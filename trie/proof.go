@@ -57,7 +57,7 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 				tn = n.Val
 				prefix = append(prefix, n.Key...)
 				key = key[len(n.Key):]
-				log.Info("bilibili loop", "marker", hexutils.BytesToHex(marker), "index", i, "type", "SHORT NODE", "note", "key found")
+				log.Info("bilibili loop", "marker", hexutils.BytesToHex(marker), "index", i, "type", "SHORT NODE", "len(n.Key)", len(n.Key), "n.Key", hexutils.BytesToHex(n.Key), "tn", tn, "note", "key found")
 			}
 			nodes = append(nodes, n)
 		case *fullNode:
