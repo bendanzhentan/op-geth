@@ -73,10 +73,10 @@ func (n hashNode) cache() (hashNode, bool)   { return nil, true }
 func (n valueNode) cache() (hashNode, bool)  { return nil, true }
 
 // Pretty printing.
-func (n *fullNode) String() string  { return n.fstring("") }
-func (n *shortNode) String() string { return n.fstring("") }
-func (n hashNode) String() string   { return n.fstring("") }
-func (n valueNode) String() string  { return n.fstring("") }
+func (n *fullNode) String() string  { return n.fstring("fullNode ") }
+func (n *shortNode) String() string { return n.fstring("shortNode ") }
+func (n hashNode) String() string   { return n.fstring("hashNode ") }
+func (n valueNode) String() string  { return n.fstring("valueNode ") }
 
 func (n *fullNode) fstring(ind string) string {
 	resp := fmt.Sprintf("[\n%s  ", ind)

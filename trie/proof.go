@@ -87,8 +87,11 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 				log.Error("Unhandled trie error in Trie.Prove", "err", err)
 				return err
 			}
-		default:
-			panic(fmt.Sprintf("%T: invalid node: %v", tn, tn))
+		case valueNode:
+			log.Info("bilibili loop", "marker", hexutils.BytesToHex(marker), "index", i, "type", "VALUE NODE")
+			nodes = append(nodes, n)
+			tn = nil
+			// panic(fmt.Sprintf("%T: invalid node: %v", tn, tn))
 		}
 		i += 1
 	}
