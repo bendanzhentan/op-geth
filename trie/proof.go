@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/status-im/keycard-go/hexutils"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -40,6 +41,7 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 		nodes  []node
 		tn     = t.root
 	)
+	marker := hexutils.BytesToHex(keybytesToHex(key))
 	key = keybytesToHex(key)
 	for len(key) > 0 && tn != nil {
 		switch n := tn.(type) {
@@ -77,11 +79,28 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 	hasher := newHasher(false)
 	defer returnHasherToPool(hasher)
 
+	putted := 0
+	discard := 0
 	for i, n := range nodes {
 		if fromLevel > 0 {
 			fromLevel--
 			continue
 		}
+
+		nodeType := "nil"
+		switch n.(type) {
+		case *shortNode:
+			nodeType = "shortNode"
+		case *fullNode:
+			nodeType = "fullNode"
+		case hashNode:
+			nodeType = "hashNode"
+		case valueNode:
+			nodeType = "valueNode"
+		default:
+			panic(fmt.Sprintf("%T: invalid node: %v", n, n))
+		}
+
 		var hn node
 		n, hn = hasher.proofHash(n)
 		if hash, ok := hn.(hashNode); ok || i == 0 {
@@ -92,8 +111,14 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 				hash = hasher.hashData(enc)
 			}
 			proofDb.Put(hash, enc)
+			putted++
+			log.Info("bilibili proofDb.Put", "marker", marker, "i", i, "node", nodeType, "ok", ok)
+		} else {
+			discard++
+			log.Info("bilibili proofDb.Discard", "marker", marker, "i", i, "node", nodeType, "ok", ok)
 		}
 	}
+	log.Info("bilibili finish", "putted", putted, "discard", discard)
 	return nil
 }
 
