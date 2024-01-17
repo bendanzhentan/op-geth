@@ -43,6 +43,7 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 	)
 	marker := hexutils.BytesToHex(keybytesToHex(key))
 	key = keybytesToHex(key)
+	log.Info("bilibili start", "marker", marker, "fromLevel", fromLevel, "proofDb", proofDb)
 	for len(key) > 0 && tn != nil {
 		switch n := tn.(type) {
 		case *shortNode:

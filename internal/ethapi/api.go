@@ -726,6 +726,7 @@ func (s *BlockChainAPI) GetProof(ctx context.Context, address common.Address, st
 			if storageError != nil {
 				return nil, storageError
 			}
+			log.Info("bilibili state.GetStorageProof", "proof.len", len(proof))
 			storageProof[i] = StorageResult{hexKey, (*hexutil.Big)(state.GetState(address, key).Big()), toHexSlice(proof)}
 		} else {
 			storageProof[i] = StorageResult{hexKey, &hexutil.Big{}, []string{}}
