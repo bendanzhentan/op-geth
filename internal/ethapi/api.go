@@ -723,6 +723,7 @@ func (s *BlockChainAPI) GetProof(ctx context.Context, address common.Address, st
 		}
 		if storageTrie != nil {
 			proof, storageError := state.GetStorageProof(address, key)
+			log.Info("bilibili state.GetStorageProof", "key", crypto.Keccak256Hash(key.Bytes()).Hex())
 			if storageError != nil {
 				return nil, storageError
 			}
@@ -735,6 +736,7 @@ func (s *BlockChainAPI) GetProof(ctx context.Context, address common.Address, st
 
 	// create the accountProof
 	accountProof, proofErr := state.GetProof(address)
+	log.Info("bilibili state.GetProof", "address", crypto.Keccak256Hash(address.Bytes()).Hex())
 	if proofErr != nil {
 		return nil, proofErr
 	}
