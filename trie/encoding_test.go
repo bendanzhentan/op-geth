@@ -69,8 +69,8 @@ func TestHexKeybytes(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		if h := keybytesToHex(test.key); !bytes.Equal(h, test.hexOut) {
-			t.Errorf("keybytesToHex(%x) -> %x, want %x", test.key, h, test.hexOut)
+		if h := KeybytesToHex(test.key); !bytes.Equal(h, test.hexOut) {
+			t.Errorf("KeybytesToHex(%x) -> %x, want %x", test.key, h, test.hexOut)
 		}
 		if k := hexToKeybytes(test.hexIn); !bytes.Equal(k, test.key) {
 			t.Errorf("hexToKeybytes(%x) -> %x, want %x", test.hexIn, k, test.key)
@@ -99,7 +99,7 @@ func TestHexToCompactInPlaceRandom(t *testing.T) {
 		l := rand.Intn(128)
 		key := make([]byte, l)
 		crand.Read(key)
-		hexBytes := keybytesToHex(key)
+		hexBytes := KeybytesToHex(key)
 		hexOrig := []byte(string(hexBytes))
 		exp := hexToCompact(hexBytes)
 		sz := hexToCompactInPlace(hexBytes)
@@ -129,7 +129,7 @@ func BenchmarkCompactToHex(b *testing.B) {
 func BenchmarkKeybytesToHex(b *testing.B) {
 	testBytes := []byte{7, 6, 6, 5, 7, 2, 6, 2, 16}
 	for i := 0; i < b.N; i++ {
-		keybytesToHex(testBytes)
+		KeybytesToHex(testBytes)
 	}
 }
 

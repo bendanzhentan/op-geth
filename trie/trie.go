@@ -119,7 +119,7 @@ func (t *Trie) Get(key []byte) []byte {
 // The value bytes must not be modified by the caller.
 // If a node was not found in the database, a MissingNodeError is returned.
 func (t *Trie) TryGet(key []byte) ([]byte, error) {
-	value, newroot, didResolve, err := t.tryGet(t.root, keybytesToHex(key), 0)
+	value, newroot, didResolve, err := t.tryGet(t.root, KeybytesToHex(key), 0)
 	if err == nil && didResolve {
 		t.root = newroot
 	}
@@ -267,7 +267,7 @@ func (t *Trie) TryUpdate(key, value []byte) error {
 // for TryUpdate and TryUpdateAccount.
 func (t *Trie) tryUpdate(key, value []byte) error {
 	t.unhashed++
-	k := keybytesToHex(key)
+	k := KeybytesToHex(key)
 	if len(value) != 0 {
 		_, n, err := t.insert(t.root, nil, k, valueNode(value))
 		if err != nil {
@@ -374,7 +374,7 @@ func (t *Trie) Delete(key []byte) {
 // If a node was not found in the database, a MissingNodeError is returned.
 func (t *Trie) TryDelete(key []byte) error {
 	t.unhashed++
-	k := keybytesToHex(key)
+	k := KeybytesToHex(key)
 	_, n, err := t.delete(t.root, nil, k)
 	if err != nil {
 		return err

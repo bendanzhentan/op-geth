@@ -42,8 +42,8 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 		nodes  []node
 		tn     = t.root
 	)
-	marker := hexutils.BytesToHex(keybytesToHex(key))
-	key = keybytesToHex(key)
+	marker := hexutils.BytesToHex(KeybytesToHex(key))
+	key = KeybytesToHex(key)
 	log.Info("bilibili start", "marker", marker, "fromLevel", fromLevel, "proofDb", proofDb)
 	for len(key) > 0 && tn != nil {
 		switch n := tn.(type) {
@@ -140,7 +140,7 @@ func (t *StateTrie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWrit
 // key in a trie with the given root hash. VerifyProof returns an error if the
 // proof contains invalid trie nodes or the wrong value.
 func VerifyProof(rootHash common.Hash, key []byte, proofDb ethdb.KeyValueReader) (value []byte, err error) {
-	key = keybytesToHex(key)
+	key = KeybytesToHex(key)
 	wantHash := rootHash
 	for i := 0; ; i++ {
 		buf, _ := proofDb.Get(wantHash[:])
@@ -198,7 +198,7 @@ func proofToPath(rootHash common.Hash, root node, key []byte, proofDb ethdb.KeyV
 		keyrest       []byte
 		valnode       []byte
 	)
-	key, parent = keybytesToHex(key), root
+	key, parent = KeybytesToHex(key), root
 	for {
 		keyrest, child = get(parent, key, false)
 		switch cld := child.(type) {
@@ -253,7 +253,7 @@ func proofToPath(rootHash common.Hash, root node, key []byte, proofDb ethdb.KeyV
 // Note we have the assumption here the given boundary keys are different
 // and right is larger than left.
 func unsetInternal(n node, left []byte, right []byte) (bool, error) {
-	left, right = keybytesToHex(left), keybytesToHex(right)
+	left, right = KeybytesToHex(left), KeybytesToHex(right)
 
 	// Step down to the fork point. There are two scenarios can happen:
 	// - the fork point is a shortnode: either the key of left proof or
@@ -448,7 +448,7 @@ func unset(parent node, child node, key []byte, pos int, removeLeft bool) error 
 // key or a non-existent one. This function has the assumption that the whole
 // path should already be resolved.
 func hasRightElement(node node, key []byte) bool {
-	pos, key := 0, keybytesToHex(key)
+	pos, key := 0, KeybytesToHex(key)
 	for node != nil {
 		switch rn := node.(type) {
 		case *fullNode:

@@ -21,6 +21,8 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/ethereum/go-ethereum/trie"
+	"github.com/status-im/keycard-go/hexutils"
 	"math/big"
 	"strings"
 	"time"
@@ -723,11 +725,17 @@ func (s *BlockChainAPI) GetProof(ctx context.Context, address common.Address, st
 		}
 		if storageTrie != nil {
 			proof, storageError := state.GetStorageProof(address, key)
-			log.Info("bilibili state.GetStorageProof", "key", crypto.Keccak256Hash(key.Bytes()).Hex())
+
 			if storageError != nil {
 				return nil, storageError
 			}
-			log.Info("bilibili state.GetStorageProof", "proof.len", len(proof))
+			log.Info(
+				"bilibili state.GetStorageProof",
+				"address", address.Hex(),
+				"key", key.Hex(),
+				"transformedKey", hexutils.BytesToHex(trie.KeybytesToHex(crypto.Keccak256Hash(key.Bytes()).Bytes())),
+				"len(proof)", len(proof),
+			)
 			storageProof[i] = StorageResult{hexKey, (*hexutil.Big)(state.GetState(address, key).Big()), toHexSlice(proof)}
 		} else {
 			storageProof[i] = StorageResult{hexKey, &hexutil.Big{}, []string{}}
@@ -736,7 +744,12 @@ func (s *BlockChainAPI) GetProof(ctx context.Context, address common.Address, st
 
 	// create the accountProof
 	accountProof, proofErr := state.GetProof(address)
-	log.Info("bilibili state.GetProof", "address", crypto.Keccak256Hash(address.Bytes()).Hex())
+	log.Info(
+		"bilibili state.GetProof",
+		"address", address.Hex(),
+		"transformedKey", hexutils.BytesToHex(trie.KeybytesToHex(crypto.Keccak256Hash(address.Bytes()).Bytes())),
+		"len(accountProof)", len(accountProof),
+	)
 	if proofErr != nil {
 		return nil, proofErr
 	}

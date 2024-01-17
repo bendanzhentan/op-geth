@@ -204,7 +204,7 @@ const (
 
 // TryUpdate inserts a (key, value) pair into the stack trie
 func (st *StackTrie) TryUpdate(key, value []byte) error {
-	k := keybytesToHex(key)
+	k := KeybytesToHex(key)
 	if len(value) == 0 {
 		panic("deletion not supported")
 	}
