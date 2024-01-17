@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/status-im/keycard-go/hexutils"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethdb"
@@ -119,7 +120,8 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 			log.Info("bilibili proofDb.Discard", "marker", marker, "i", i, "node", nodeType, "ok", ok)
 		}
 	}
-	log.Info("bilibili finish", "putted", putted, "discard", discard)
+	log.Info("bilibili finish", "marker", marker, "putted", putted, "discard", discard)
+	time.Sleep(1 * time.Second)
 	return nil
 }
 
