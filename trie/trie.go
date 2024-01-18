@@ -120,48 +120,48 @@ func (t *Trie) Get(key []byte) []byte {
 // The value bytes must not be modified by the caller.
 // If a node was not found in the database, a MissingNodeError is returned.
 func (t *Trie) TryGet(key []byte) ([]byte, error) {
-	value, newroot, didResolve, err := t.tryGet(t.root, KeybytesToHex(key), 0)
+	value, newroot, didResolve, err := t.tryGet(t.root, KeybytesToHex(key), 0, 0)
 	if err == nil && didResolve {
 		t.root = newroot
 	}
 	return value, err
 }
 
-func (t *Trie) tryGet(origNode node, key []byte, pos int) (value []byte, newnode node, didResolve bool, err error) {
+func (t *Trie) tryGet(origNode node, key []byte, pos int, depth int) (value []byte, newnode node, didResolve bool, err error) {
 	switch n := (origNode).(type) {
 	case nil:
 		return nil, nil, false, nil
 	case valueNode:
-		log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "nodeType", "valueNode", "pos", pos, "node", n.String())
+		log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "depth", depth, "nodeType", "valueNode", "pos", pos, "node", n.String())
 		return n, n, false, nil
 	case *shortNode:
 		if len(key)-pos < len(n.Key) || !bytes.Equal(n.Key, key[pos:pos+len(n.Key)]) {
 			// key not found in trie
-			log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "nodeType", "shortNode", "pos", pos, "node", "not found")
+			log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "depth", depth, "nodeType", "shortNode", "pos", pos, "node", "not found")
 			return nil, n, false, nil
 		}
-		value, newnode, didResolve, err = t.tryGet(n.Val, key, pos+len(n.Key))
+		value, newnode, didResolve, err = t.tryGet(n.Val, key, pos+len(n.Key), depth+1)
 		if err == nil && didResolve {
 			n = n.copy()
 			n.Val = newnode
 		}
-		log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "nodeType", "shortNode", "pos", pos, "node", n.String())
+		log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "depth", depth, "nodeType", "shortNode", "pos", pos, "node", n.String())
 		return value, n, didResolve, err
 	case *fullNode:
-		value, newnode, didResolve, err = t.tryGet(n.Children[key[pos]], key, pos+1)
+		value, newnode, didResolve, err = t.tryGet(n.Children[key[pos]], key, pos+1, depth+1)
 		if err == nil && didResolve {
 			n = n.copy()
 			n.Children[key[pos]] = newnode
 		}
-		log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "nodeType", "fullNode", "pos", pos, "node", n.String())
+		log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "depth", depth, "nodeType", "fullNode", "pos", pos, "node", n.String())
 		return value, n, didResolve, err
 	case hashNode:
 		child, err := t.resolveAndTrack(n, key[:pos])
 		if err != nil {
 			return nil, n, true, err
 		}
-		value, newnode, _, err := t.tryGet(child, key, pos)
-		log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "nodeType", "hashNode", "pos", pos, "node", n.String())
+		value, newnode, _, err := t.tryGet(child, key, pos, depth+1)
+		log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "depth", depth, "nodeType", "hashNode", "pos", pos, "node", n.String())
 		return value, newnode, true, err
 	default:
 		panic(fmt.Sprintf("%T: invalid node: %v", origNode, origNode))
