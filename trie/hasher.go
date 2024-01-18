@@ -198,7 +198,7 @@ func (h *hasher) proofHash(original node) (collapsed, hashed node) {
 	switch n := original.(type) {
 	case *shortNode:
 		sn, _ := h.hashShortNodeChildren(n)
-		return sn, h.shortnodeToHash(sn, false)
+		return sn, h.shortnodeToHash(sn, true)
 	case *fullNode:
 		fn, _ := h.hashFullNodeChildren(n)
 		return fn, h.fullnodeToHash(fn, false)

@@ -36,8 +36,8 @@ import (
 // nodes of the longest existing prefix of the key (at least the root node), ending
 // with the node that proves the absence of the key.
 func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) error {
-	res := t.Get(key)
-	log.Info("bilibili Trie.Get", "key", hexutils.BytesToHex(key), "res", hexutils.BytesToHex(res))
+	// res := t.Get(key)
+	// log.Info("bilibili Trie.Get", "key", hexutils.BytesToHex(key), "res", hexutils.BytesToHex(res))
 
 	// Collect all nodes on the path to key.
 	var (
@@ -121,6 +121,8 @@ func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) e
 			putted++
 			log.Info("bilibili proofDb.Put", "marker", marker, "i", i, "nodeType", nodeType, "nodeVal", nodeVal, "ok", ok)
 		} else {
+			// 187:INFO [01-18|10:19:28.934] bilibili proofDb.Discard                 marker=050B0A060B07000F09060602000D02070100020D040709090D0205090F0E00080F0609000C000A02010B08000D000A010A0900030D0B0608020401070A02030F10 i=8 nodeType=shortNode nodeVal=nil ok=false
+			// 问题出在为什么要 discard shortnode
 			discard++
 			log.Info("bilibili proofDb.Discard", "marker", marker, "i", i, "nodeType", nodeType, "nodeVal", nodeVal, "ok", ok)
 		}
