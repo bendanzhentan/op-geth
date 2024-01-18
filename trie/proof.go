@@ -36,6 +36,9 @@ import (
 // nodes of the longest existing prefix of the key (at least the root node), ending
 // with the node that proves the absence of the key.
 func (t *Trie) Prove(key []byte, fromLevel uint, proofDb ethdb.KeyValueWriter) error {
+	res := t.Get(key)
+	log.Info("bilibili Trie.Get", "key", hexutils.BytesToHex(key), "res", hexutils.BytesToHex(res))
+
 	// Collect all nodes on the path to key.
 	var (
 		prefix []byte

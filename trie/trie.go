@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/status-im/keycard-go/hexutils"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -131,10 +132,12 @@ func (t *Trie) tryGet(origNode node, key []byte, pos int) (value []byte, newnode
 	case nil:
 		return nil, nil, false, nil
 	case valueNode:
+		log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "nodeType", "valueNode", "pos", pos, "node", n.String())
 		return n, n, false, nil
 	case *shortNode:
 		if len(key)-pos < len(n.Key) || !bytes.Equal(n.Key, key[pos:pos+len(n.Key)]) {
 			// key not found in trie
+			log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "nodeType", "shortNode", "pos", pos, "node", "not found")
 			return nil, n, false, nil
 		}
 		value, newnode, didResolve, err = t.tryGet(n.Val, key, pos+len(n.Key))
@@ -142,6 +145,7 @@ func (t *Trie) tryGet(origNode node, key []byte, pos int) (value []byte, newnode
 			n = n.copy()
 			n.Val = newnode
 		}
+		log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "nodeType", "shortNode", "pos", pos, "node", n.String())
 		return value, n, didResolve, err
 	case *fullNode:
 		value, newnode, didResolve, err = t.tryGet(n.Children[key[pos]], key, pos+1)
@@ -149,6 +153,7 @@ func (t *Trie) tryGet(origNode node, key []byte, pos int) (value []byte, newnode
 			n = n.copy()
 			n.Children[key[pos]] = newnode
 		}
+		log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "nodeType", "fullNode", "pos", pos, "node", n.String())
 		return value, n, didResolve, err
 	case hashNode:
 		child, err := t.resolveAndTrack(n, key[:pos])
@@ -156,6 +161,7 @@ func (t *Trie) tryGet(origNode node, key []byte, pos int) (value []byte, newnode
 			return nil, n, true, err
 		}
 		value, newnode, _, err := t.tryGet(child, key, pos)
+		log.Info("bilibili tryGet", "marker", hexutils.BytesToHex(key), "nodeType", "hashNode", "pos", pos, "node", n.String())
 		return value, newnode, true, err
 	default:
 		panic(fmt.Sprintf("%T: invalid node: %v", origNode, origNode))
